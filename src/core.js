@@ -1,5 +1,6 @@
 // http://teropa.info/blog/2015/09/10/full-stack-redux-tutorial.html
 import {List, Map} from 'immutable';
+export const INITIAL_STATE = Map();
 
 export function setEntries(state, entries) {
   return state.set('entries', List(entries));
@@ -34,14 +35,14 @@ function getWinners(vote) {
 export function next(state) {
   const entries = state.get('entries')
                        .concat(getWinners(state.get('vote')));
-console.log(entries);
-  if (entries.length === 1) {
-    return Map({
-      winner: entries[0]
-    })
-  };
-  return state.merge({
-    vote: Map({pair: entries.take(2)}),
-    entries: entries.skip(2)
-  });
+  if (entries.size === 1) {
+    return state.remove('vote')
+                .remove('entries')
+                .set('winner', entries.first());
+  } else {
+    return state.merge({
+      vote: Map({pair: entries.take(2)}),
+      entries: entries.skip(2)
+    });
+  }
 }
