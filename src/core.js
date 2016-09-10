@@ -15,6 +15,10 @@ export function next(state) {
 }
 
 export function vote(voteState, entry) {
+  const [a, b] = voteState.get('pair');
+// when entry is NOT in current pair, return old voteState; No change
+// suggested answer: https://github.com/teropa/redux-voting-server/commit/exercise-1
+  if ([a, b].indexOf(entry) == -1) return voteState;
   return voteState.updateIn(
     ['tally', entry],
     0,
