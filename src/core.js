@@ -14,12 +14,14 @@ export function next(state) {
   });
 }
 
-export function vote(voteState, entry) {
+export function vote(voteState, entry, voter) {
   const [a, b] = voteState.get('pair');
 // when entry is NOT in current pair, return old voteState; No change
 // suggested answer: https://github.com/teropa/redux-voting-server/commit/exercise-1
   if ([a, b].indexOf(entry) == -1) return voteState;
-  return voteState.updateIn(
+  const nullifiedVoteState = nullifyVoting(voteState, entry, voter);
+  const newVoteState       = recordVoting(nullifiedVoteState, entry, voter);
+  return newVoteState.updateIn(
     ['tally', entry],
     0,
     tally => tally + 1
@@ -50,3 +52,24 @@ export function next(state) {
     });
   }
 }
+
+function recordVoting(voteState, entry, voter) {
+// setIn(keyPath: Array<any>, value: any): Map<K, V>
+// setIn(KeyPath: Iterable<any, any>, value: any): Map<K, V>
+  return voteState.setIn(
+    ['votes'],
+    Map([[voter, entry]])
+  );
+};
+
+function nullifyVoting(voteState, entry, voter) {
+  const oldEntry = voteState.getIn(['votes', voter], null);
+  if(oldEntry === null){return voteState };
+  return voteState.deleteIn(
+    ['votes', voter]
+  ).updateIn(
+    ['tally', oldEntry],
+    0,
+    tally => tally - 1
+  );
+};

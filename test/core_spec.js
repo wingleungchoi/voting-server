@@ -113,7 +113,7 @@ describe('application logic', () => {
           'Trainspotting': 1
         }),
         votes: Map({
-          vote1: 'Trainspotting'
+          voter1: 'Trainspotting'
         })
       }));
     });
@@ -135,7 +135,7 @@ describe('application logic', () => {
           '28 Days Later': 2
         }),
         votes: Map({
-          vote1: 'Trainspotting'
+          voter1: 'Trainspotting'
         })
       }));
     });
