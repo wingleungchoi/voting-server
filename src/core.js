@@ -19,6 +19,7 @@ export function vote(voteState, entry, voter) {
 // when entry is NOT in current pair, return old voteState; No change
 // suggested answer: https://github.com/teropa/redux-voting-server/commit/exercise-1
   if ([a, b].indexOf(entry) == -1) return voteState;
+
   const nullifiedVoteState = nullifyVoting(voteState, entry, voter);
   const newVoteState       = recordVoting(nullifiedVoteState, entry, voter);
   return newVoteState.updateIn(
@@ -47,7 +48,10 @@ export function next(state) {
                 .set('winner', entries.first());
   } else {
     return state.merge({
-      vote: Map({pair: entries.take(2)}),
+      vote: Map({
+        pair: entries.take(2),
+        round: (state.getIn(['vote', 'round']) || 0) + 1,
+      }),
       entries: entries.skip(2)
     });
   }
