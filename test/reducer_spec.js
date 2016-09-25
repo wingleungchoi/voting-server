@@ -39,7 +39,7 @@ describe('reducer', () => {
       },
       entries: []
     });
-    const action = {type: 'VOTE', entry: 'Trainspotting', voter: 'voter1'};
+    const action = {type: 'VOTE', entry: 'Trainspotting', clientId: 'voter1'};
     const nextState = reducer(initialState, action);
 
     expect(nextState).to.equal(fromJS({
