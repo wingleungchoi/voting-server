@@ -3,15 +3,9 @@ import {List, Map} from 'immutable';
 export const INITIAL_STATE = Map();
 
 export function setEntries(state, entries) {
-  return state.set('entries', List(entries));
-}
-
-export function next(state) {
-  const entries = state.get('entries');
-  return state.merge({
-    vote: Map({pair: entries.take(2)}),
-    entries: entries.skip(2)
-  });
+  const list = List(entries);
+  return state.set('entries',        list)
+              .set('initialEntries', list);
 }
 
 export function vote(voteState, entry, voter) {
@@ -39,7 +33,7 @@ function getWinners(vote) {
   else                       return [a, b];
 }
 
-export function next(state) {
+export function next(state, round = state.getIn(['vote', 'round'], 0) ) {
   const entries = state.get('entries')
                        .concat(getWinners(state.get('vote')));
   if (entries.size === 1) {
@@ -50,7 +44,7 @@ export function next(state) {
     return state.merge({
       vote: Map({
         pair: entries.take(2),
-        round: (state.getIn(['vote', 'round']) || 0) + 1,
+        round: round + 1,
       }),
       entries: entries.skip(2)
     });
@@ -65,6 +59,16 @@ function recordVoting(voteState, entry, voter) {
     Map([[voter, entry]])
   );
 };
+
+export function restart(state) {
+  const round = state.getIn(['vote', 'round'], 0);
+  return next(
+    state.set('entries', state.get('initialEntries'))
+         .remove('vote')
+         .remove('winner'),
+    round
+  );
+}
 
 function nullifyVoting(voteState, entry, voter) {
   const oldEntry = voteState.getIn(['votes', voter], null);
